@@ -1,7 +1,7 @@
 {
   "slug": "AlliewayAudio_Freebies",
   "name": "AlliewayAudio_Freebies",
-  "version": "1.0.0-beta1",
+  "version": "1.0.0-beta2",
   "license": "GPL-3.0-or-later",
   "brand": "AlliewayAudio",
   "author": "Allie",
@@ -19,7 +19,7 @@
       "description": "1:1 digital recreation of Mannequins 'Cold Mac' esoteric macro-utility (made with permission, but not by Mannequins)",
       "tags": [
         "Attenuator",
-        "Controller",
+        "Compressor",
         "Envelope follower",
         "Logic",
         "Ring modulator",
