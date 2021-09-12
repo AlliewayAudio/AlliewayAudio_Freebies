@@ -3,8 +3,6 @@
 // Be warned that, as the immortal programmar Roast Beef said, "My code is a Dog's code."
 // Gratitude to Mannequins for letting me create this humble clone of their awesome work as a way to learn VCVrack :D
 
-// todo: create an expander which adds dedicated macro knob output, envelope follower rise/fall settings, location speed knob, etc etc
-
 // Introduce simple filter class which blocks DC signal (for mixer)
 class DCBlocker
 {
