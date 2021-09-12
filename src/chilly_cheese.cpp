@@ -165,8 +165,8 @@ struct Chilly_cheese : Module {
 		}
 		cheese += dc5.process(slope); // penultimate cheese ingredient added
 		float crease = slope;
-		slope = clamp(slope, -5.f, 5.f);
 		slope = abs(slope);
+    slope = clamp(slope, -5.f, 5.f);
     slew.setCutoffFreq(20.0f / args.sampleRate); // make this configurable in the future (context menu / expander?)
 		slew.process(slope);
     float follow = slew.lowpass();
