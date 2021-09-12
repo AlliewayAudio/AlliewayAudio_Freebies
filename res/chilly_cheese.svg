@@ -30,9 +30,9 @@
    inkscape:pageopacity="0.0"
    inkscape:pagecheckerboard="0"
    showgrid="false"
-   inkscape:zoom="5.6568542"
-   inkscape:cx="80.25662"
-   inkscape:cy="448.92442"
+   inkscape:zoom="2"
+   inkscape:cx="-17.5"
+   inkscape:cy="89.750001"
    inkscape:window-width="1827"
    inkscape:window-height="1051"
    inkscape:window-x="84"
@@ -549,7 +549,7 @@
    inkscape:groupmode="layer"
    id="layer1"
    inkscape:label="components"
-   style="display:inline"><circle
+   style="display:none"><circle
      style="fill:#00ff00;fill-opacity:1;stroke-width:0.0905463"
      id="macro_cvin"
      cx="6.86271"
