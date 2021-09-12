@@ -212,7 +212,7 @@ struct Chilly_cheese : Module {
 		crease = clamp(crease, -5.f, 5.f);
 		outputs[CREASE_OUTPUT].setVoltage(crease);
 		// PREPARE THE CHEESE!!!
-		cheese = clamp(cheese*macro, -12.0f, 12.0f);
+		cheese = clamp(cheese*macro, -10.0f, 10.0f);
 		outputs[CHEESE_OUTPUT].setVoltage(cheese);
 	}
 };
