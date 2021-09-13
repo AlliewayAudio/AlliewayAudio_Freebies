@@ -50,7 +50,7 @@ struct Chilly_cheese : Module {
 
   // initialize location, slew, dc blockers
 	float location = 0.f;
-	dsp::RCFilter slew;
+  dsp::BiquadFilter slew;
   DCBlocker dc1, dc2, dc3, dc4, dc5, dc6;
 	enum ParamIds {
 		MACRO_PARAM,
@@ -166,12 +166,10 @@ struct Chilly_cheese : Module {
 		cheese += dc5.process(slope); // penultimate cheese ingredient added
 		float crease = slope;
 		slope = abs(slope);
-    slope = clamp(slope, -5.f, 5.f);
-    slew.setCutoffFreq(20.0f / args.sampleRate); // make this configurable in the future (context menu / expander?)
-		slew.process(slope);
-    float follow = slew.lowpass();
-    follow = sqrt(follow*5)*2.5;
-    follow = clamp(follow, -5.f, 5.f);
+    slope = clamp(slope, 0.f, 5.f);
+    slew.setParameters(dsp::BiquadFilter::LOWPASS_1POLE, 5.f / args.sampleRate, 0.f, 1.f);
+    float follow = slew.process(slope);
+    follow = clamp(follow * 1.5, 0.f, 10.f);
 		outputs[SLOPE_OUTPUT].setVoltage(slope);
 		outputs[FOLLOW_OUTPUT].setVoltage(follow);
 		// crease/location calc and normalling
