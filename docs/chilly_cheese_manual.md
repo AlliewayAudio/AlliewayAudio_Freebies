@@ -20,9 +20,9 @@ Using this one big knob, you can control many or all of the function blocks simu
 
 All this information is really just a teaser of what you can do with Chilly Cheese - however, any documentation I could write would pale in comparison to the wonderful work which has already been done for Cold Mac. For this reason, I highly recommend you check out the following links:
 
-The Official Cold Mac Technical Map: https://github.com/whimsicalraps/Mannequins-Technical-Maps/blob/master/cold-mac/cold-mac-web.md
-Patching Cold Mac: https://doudoroff.com/cold-mac/
-Cold Mac Ideas (on Lines Forum): https://llllllll.co/t/cold-mac-ideas/3840
+* The Official Cold Mac Technical Map: https://github.com/whimsicalraps/Mannequins-Technical-Maps/blob/master/cold-mac/cold-mac-web.md
+* Patching Cold Mac: https://doudoroff.com/cold-mac/
+* Cold Mac Ideas (on Lines Forum): https://llllllll.co/t/cold-mac-ideas/3840
 
 These will get you up and running patching Chilly Cheese - the only differences to keep in mind between Cold Mac and Chilly Cheese are:
 
