@@ -36,5 +36,5 @@ Please enjoy Chilly Cheese responsibly, and send me an email if you find any iss
 
 Thanks for reading :)
 
-Love, Allie
-alliewayaudio@gmail.com
+- Love, Allie
+- alliewayaudio@gmail.com
