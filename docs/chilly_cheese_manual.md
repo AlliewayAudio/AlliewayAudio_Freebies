@@ -24,11 +24,11 @@ All this information is really just a teaser of what you can do with Chilly Chee
 * Patching Cold Mac: https://doudoroff.com/cold-mac/
 * Cold Mac Ideas (on Lines Forum): https://llllllll.co/t/cold-mac-ideas/3840
 
-These will get you up and running patching Chilly Cheese - the only differences to keep in mind between Cold Mac and Chilly Cheese are:
+These will get you up and running patching Chilly Cheese - **the only differences to keep in mind between Cold Mac and Chilly Cheese are:**
 
 1. Naming - "SURVEY" has become "MACRO", and "MAC" has become "CHEESE". Yum.
 2. This is an imperfect digital emulation of an analog module - it will behave differently in some scenarios (especially feedback patching), but most patches should work almost identically on both units. Please send me a message if that is not the case!
-3. Finally, the one added feature (for now) is that you can adjust the speed of the "LOCATION" (aka integrator) circuit by Right-Clicking the module and choosing from the 5 available speeds: The "default" setting is halfway between "Slowish" and "Quickish"
+3. Finally, the one added feature (for now!) is that you can adjust the speed of the "LOCATION" (aka integrator) circuit by Right-Clicking the module and choosing from the 5 available speeds: The "default" setting is halfway between "Slowish" and "Quickish"
 
 Please enjoy Chilly Cheese responsibly, and send me an email if you find any issues with Cold Mac, or if you just wanna say hey! You can also open a github issue for the former case.
 
