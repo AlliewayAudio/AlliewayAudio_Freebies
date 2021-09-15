@@ -2,7 +2,7 @@
 
 Chilly Cheese is a digital recreation/homage (made with permission!) of the analog eurorack module "Cold Mac". **However, it was not made by Whimsical Raps (the makers of cold mac), and is not sponsored or endorsed by them.** If you are interested in purchasing a real Cold Mac, please check here for more information on their availability: https://www.whimsicalraps.com/products/cold-mac
 
-There is so much that can be said about the original Cold Mac - It's design is simply brilliant and I find it very inspiring. I describe it as an "Esoteric Macro-Utility", which can do so many things (but unified by the concept of a unified macro controlling it all).
+There is so much that can be said about the original Cold Mac - It's design is simply brilliant and I find it very inspiring. I describe it as an "Esoteric Macro-Utility", which can do so many things (but unified by the concept of intertangled normallings and a macro controlling it all).
 
 **It takes voltages from -5 to +5 for all it's inputs - this is to mirror the behavior of the original module. The audio mixer and slew, however, can output up to 10v total before clipping.**
 
