@@ -1,6 +1,6 @@
 # CHILLY CHEESE MANUAL
 
-Chilly Cheese is a digital recreation/homage (made with permission!) of the analog eurorack module "Cold Mac", made by Mannequins / Whimsical Raps. **However, it was not made by Whimsical Raps, and is not sponsored or endorsed by them.** If you are interested in purchasing a real Cold Mac, please check here for more information on their availability: https://www.whimsicalraps.com/products/cold-mac
+Chilly Cheese is a digital recreation/homage (made with permission!) of the analog eurorack module "Cold Mac". **However, it was not made by Whimsical Raps (the makers of cold mac), and is not sponsored or endorsed by them.** If you are interested in purchasing a real Cold Mac, please check here for more information on their availability: https://www.whimsicalraps.com/products/cold-mac
 
 There is so much that can be said about Cold Mac - It's design is simply brilliant and I find it very inspiring. I describe it as an "Esoteric Macro-Utility", which can do so many things (but unified by the concept of a unified macro controlling it all).
 
