@@ -2,7 +2,7 @@ name: Build VCV Rack Plugin
 on: [push, pull_request]
 
 env:
-  rack-sdk-version: 1.1.6
+  rack-sdk-version: 2.0.5
 
 defaults:
   run:
@@ -17,16 +17,19 @@ jobs:
         config:
         - {
             name: Linux,
-            os: ubuntu-18.04,
-            prepare-os: sudo apt install -y libglu-dev
+            sdk-platform: lin,
+            os: ubuntu-latest,
+            prepare-os: sudo apt update && sudo apt install -y libglu-dev
           }
         - {
             name: MacOS,
+            sdk-platform: mac,
             os: macos-latest,
             prepare-os: ""
           }
         - {
             name: Windows,
+            sdk-platform: win,
             os: windows-latest,
             prepare-os: export CC=gcc
           }
@@ -37,16 +40,16 @@ jobs:
       - name: Get Rack-SDK
         run: |
           pushd $HOME
-          curl -o Rack-SDK.zip https://vcvrack.com/downloads/Rack-SDK-${{ env.rack-sdk-version }}.zip
+          curl -o Rack-SDK.zip https://vcvrack.com/downloads/Rack-SDK-${{ env.rack-sdk-version }}-${{ matrix.config.sdk-platform }}.zip
           unzip Rack-SDK.zip
-      - name: Patch plugin.mk, use 7zip on Windows
-        if: runner.os == 'Windows'
+      - name: Modify plugin version
+        # only modify plugin version if no tag was created
+        if: "! startsWith(github.ref, 'refs/tags/v')"
         run: |
-          sed -i 's/zip -q -9 -r/7z a -tzip -mx=9/' $HOME/Rack-SDK/plugin.mk
-      - name: Patch Makefile to use old glibc versions
-        if: runner.os == 'Linux'
-        run: |
-          echo "FLAGS += -include force_link_glibc_2.23.h" >> Makefile
+          gitrev=`git rev-parse --short HEAD`
+          pluginversion=`jq -r '.version' plugin.json`
+          echo "Set plugin version from $pluginversion to $pluginversion-$gitrev"
+          cat <<< `jq --arg VERSION "$pluginversion-$gitrev" '.version=$VERSION' plugin.json` > plugin.json
       - name: Build plugin
         run: |
           ${{ matrix.config.prepare-os }}
@@ -61,17 +64,39 @@ jobs:
 
   publish:
     name: Publish plugin
-    runs-on: ubuntu-18.04
+    # only create a release if a tag was created that is called e.g. v1.2.3
+    # see also https://vcvrack.com/manual/Manifest#version
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
     needs: build
     steps:
+      - uses: actions/checkout@v2
+      - uses: FranzDiebold/github-env-vars-action@v1.2.1
+      - name: Check if plugin version matches tag
+        run: |
+          pluginversion=`jq -r '.version' plugin.json`
+          if [ "v$pluginversion" != "${{ env.GITHUB_REF_NAME }}" ]; then
+            echo "Plugin version from plugin.json 'v$pluginversion' doesn't match with tag version '${{ env.GITHUB_REF_NAME }}'"
+            exit 1
+          fi
+      - name: Create Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            ${{ env.GITHUB_REPOSITORY_NAME }} VCV Rack Plugin ${{ env.GITHUB_REF_NAME }}
+          draft: false
+          prerelease: false
       - uses: actions/download-artifact@v2
         with:
           path: _artifacts
-      - uses: "marvinpinto/action-automatic-releases@latest"
+      - name: Upload release assets
+        uses: svenstaro/upload-release-action@v2
         with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "latest"
-          prerelease: true
-          title: "Development Build"
-          files: |          
-            _artifacts/**/*.zip
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: _artifacts/**/*.vcvplugin
+          tag: ${{ github.ref }}
+          file_glob: true
