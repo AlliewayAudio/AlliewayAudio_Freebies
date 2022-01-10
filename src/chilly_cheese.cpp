@@ -3,6 +3,15 @@
 // Be warned that, as the immortal programmar Roast Beef said, "My code is a Dog's code."
 // Gratitude to Mannequins for letting me create this humble clone of their awesome work as a way to learn VCVrack :D
 
+// Soft clipping algo for Cheese output
+float clip(float x) {
+    // Pade approximant of x/(1 + x^12)^(1/12)
+    const float limit = 1.16691853009184f;
+    x = clamp(x, -limit, limit);
+    return (x + 1.45833f*std::pow(x, 13) + 0.559028f*std::pow(x, 25) + 0.0427035f*std::pow(x, 37))
+        / (1.f + 1.54167f*std::pow(x, 12) + 0.642361f*std::pow(x, 24) + 0.0579909f*std::pow(x, 36));
+}
+
 // Introduce simple filter class which blocks DC signal (for mixer)
 class DCBlocker
 {
@@ -48,10 +57,12 @@ struct Chilly_cheese : Module {
 			mode = json_integer_value(modeJ);
 	}
 
-  // initialize location, slew, dc blockers
+  // initialize location, slew, dc blockers, etc
 	float location = 0.f;
   dsp::BiquadFilter slew;
   DCBlocker dc1, dc2, dc3, dc4, dc5, dc6;
+  bool firstsample = true;
+
 	enum ParamIds {
 		MACRO_PARAM,
 		NUM_PARAMS
@@ -89,9 +100,35 @@ struct Chilly_cheese : Module {
 	Chilly_cheese() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		configParam(MACRO_PARAM, 0.f, 1.f, 0.5f, "MACRO");
+
+    configInput(MACRO_INPUT, "Macro CV");
+    configInput(FADE_INPUT, "Fade (Normalled to Macro)");
+    configInput(LEFT_INPUT, "Left (Normalled to -5v)");
+    configInput(OFFSET_INPUT, "Offset");
+    configInput(RIGHT_INPUT, "Right (Normalled to +5v)");
+    configInput(OR1_INPUT, "OR 1");
+    configInput(OR2_INPUT, "OR 2 (Normalled to Macro)");
+    configInput(AND1_INPUT, "AND 1 (Normalled to OR 1)");
+    configInput(AND2_INPUT, "AND 2 (Normalled to Macro)");
+    configInput(SLOPE_INPUT, "Slope (Normalled to Macro)");
+    configInput(CREASE_INPUT, "Crease (Normalled to Slope)");
+
+    configOutput(LEFT_OUTPUT, "Left");
+    configOutput(RIGHT_OUTPUT, "Right");
+    configOutput(OR_OUTPUT, "OR");
+    configOutput(AND_OUTPUT, "AND");
+    configOutput(SLOPE_OUTPUT, "Slope");
+    configOutput(FOLLOW_OUTPUT, "Follow");
+    configOutput(CREASE_OUTPUT, "Crease");
+    configOutput(LOCATION_OUTPUT, "Location");
+    configOutput(CHEESE_OUTPUT, "Cheese");
 	}
 
 	void process(const ProcessArgs& args) override {
+    if (firstsample) {
+      slew.setParameters(dsp::BiquadFilter::LOWPASS_1POLE, 5.f / args.sampleRate, 0.5f, 1.f);
+      firstsample = false;
+    }
 		// setup macro and macro cv
 		float macro = params[MACRO_PARAM].getValue();
 		float macrovolts = (macro * 10) - 5;
@@ -99,7 +136,6 @@ struct Chilly_cheese : Module {
 		if ( inputs[MACRO_INPUT].isConnected() ) {
 			macro_cvin = inputs[MACRO_INPUT].getVoltage();
 		}
-		macro_cvin = clamp(macro_cvin, -5.f, 5.f);
 		macro += (macro_cvin / 10);
 		macro = clamp(macro, 0.f, 1.f);
 		macrovolts += macro_cvin;
@@ -123,8 +159,11 @@ struct Chilly_cheese : Module {
 			fade = clamp(fade, 0.f, 1.f);
 		}
 		float offset = inputs[OFFSET_INPUT].getVoltage();
-		float leftfaded = ( ( 1.f - fade) * left ) + ( fade * right ) + offset;
-		float rightfaded = ( ( 1.f - fade) * right ) + ( fade * left ) + offset;
+
+    // updated crossfader algorithm (thanks trent!)
+    float fadeddiff = fade * (right - left);
+    float leftfaded  = left  + fadeddiff + offset;
+    float rightfaded = right - fadeddiff + offset;
 		leftfaded = clamp(leftfaded, -5.f, 5.f);
 		rightfaded = clamp(rightfaded, -5.f, 5.f);
 		outputs[LEFT_OUTPUT].setVoltage(leftfaded);
@@ -135,13 +174,9 @@ struct Chilly_cheese : Module {
 		float or1, or_output, and1, and_output;
 		or1 = and1 = inputs[OR1_INPUT].getVoltage();
 		if ( inputs[OR2_INPUT].isConnected() ) {
-			or2 = and2 = inputs[OR2_INPUT].getVoltage();
+			or2 = inputs[OR2_INPUT].getVoltage();
 		}
-		if (or1 >= or2) {
-			or_output = or1;
-		} else {
-			or_output = or2;
-		}
+		or_output = (or1 >= or2) ? or1 : or2;
 		or_output = clamp(or_output, -5.f, 5.f);
 		outputs[OR_OUTPUT].setVoltage(or_output);
 		if ( inputs[AND1_INPUT].isConnected() ) {
@@ -167,7 +202,6 @@ struct Chilly_cheese : Module {
 		float crease = slope;
 		slope = abs(slope);
     slope = clamp(slope, 0.f, 5.f);
-    slew.setParameters(dsp::BiquadFilter::LOWPASS_1POLE, 5.f / args.sampleRate, 0.f, 1.f);
     float follow = slew.process(slope);
     follow = clamp(follow * 1.5, 0.f, 10.f);
 		outputs[SLOPE_OUTPUT].setVoltage(slope);
@@ -177,26 +211,9 @@ struct Chilly_cheese : Module {
 			crease = inputs[CREASE_INPUT].getVoltage();
 		}
     // "location" aka Integrator has 6 different modes - default, glacial, sluggish, slowish, quickish, and snappy
-    switch(mode) {
-      case 0 :
-        location += (crease/25000);
-        break;
-      case 1 :
-        location += (crease/300000);
-        break;
-      case 2 :
-        location += (crease/100000);
-        break;
-      case 3 :
-        location += (crease/50000);
-        break;
-      case 4 :
-        location += (crease/12500);
-        break;
-      case 5 :
-        location += (crease/6250);
-        break;
-    }
+    // fun fact: according to Trent, Sluggish Mode is the most accurate to the physical module's integrator!
+    const float CREASES_[] = {1.f/25000, 1.f/300000, 1.f/115200, 1.f/50000, 1.f/12500, 1.f/6250};
+		location += crease * CREASES_[mode];
     location = clamp(location, -5.f, 5.f);
     outputs[LOCATION_OUTPUT].setVoltage(location);
 		cheese += dc6.process(crease); // final cheese ingredient added
@@ -207,8 +224,8 @@ struct Chilly_cheese : Module {
 		}
 		crease = clamp(crease, -5.f, 5.f);
 		outputs[CREASE_OUTPUT].setVoltage(crease);
-		// PREPARE THE CHEESE!!!
-		cheese = clamp(cheese*macro, -10.0f, 10.0f);
+		// SAY CHEESE!!! ^_^
+		cheese = clip(cheese*macro*0.1f)*10.f;
 		outputs[CHEESE_OUTPUT].setVoltage(cheese);
 	}
 };
