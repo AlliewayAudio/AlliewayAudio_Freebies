@@ -48,8 +48,8 @@ jobs:
         run: |
           gitrev=`git rev-parse --short HEAD`
           pluginversion=`jq -r '.version' plugin.json`
-          echo "Set plugin version from $pluginversion to $pluginversion-$gitrev"
-          cat <<< `jq --arg VERSION "$pluginversion-$gitrev" '.version=$VERSION' plugin.json` > plugin.json
+          echo "Set plugin version from $pluginversion to $pluginversion.$gitrev"
+          cat <<< `jq --arg VERSION "$pluginversion.$gitrev" '.version=$VERSION' plugin.json` > plugin.json
       - name: Build plugin
         run: |
           ${{ matrix.config.prepare-os }}
